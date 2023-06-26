@@ -2,12 +2,27 @@ import React, {useEffect, useState} from 'react';
 import Collection from "./components/Collection/Collection";
 import {TPhoto} from "./types";
 
+const cats = [
+    {"name": "All"},
+    {"name": "Mountains"},
+    {"name": "Sea"},
+    {"name": "Architecture"},
+    {"name": "Cities"}
+]
+
 const App = () => {
+    const [categoryId, setCategoryId] = useState(0);
+    const [page, setPage] = useState(1);
+    const [isLoading, setIsLoading] = useState(true);
     const [searchValue, setSearchValue] = useState('');
     const [collections, setCollections] = useState<TPhoto[]>([]);
 
     useEffect(() => {
-        fetch('https://6499634679fbe9bcf83f2512.mockapi.io/photo_collections')
+        setIsLoading(true);
+
+        const category = categoryId ? `category=${categoryId}` : '';
+
+        fetch(`https://6499634679fbe9bcf83f2512.mockapi.io/photo_collections?page=${page}&limit=3&${category}`)
             .then((res) => res.json())
             .then((json) => {
                 setCollections(json)
@@ -15,19 +30,26 @@ const App = () => {
             .catch((err) => {
                 console.warn(err);
                 alert('Connection error');
-            });
-    }, []);
+            })
+            .finally(() => setIsLoading(false));
+    }, [categoryId, page]);
 
     return (
         <div className="App">
             <h1>My photo collection</h1>
             <div className="top">
                 <ul className="tags">
-                    <li className="active">All</li>
-                    <li>Mountains</li>
-                    <li>Sea</li>
-                    <li>Architecture</li>
-                    <li>Cities</li>
+                    {
+                        cats.map((item, index) => (
+                            <li
+                                onClick={() => setCategoryId(index)}
+                                className={categoryId === index ? 'active' : ''}
+                                key={item.name}
+                            >
+                                {item.name}
+                            </li>
+                        ))
+                    }
                 </ul>
                 <input
                     value={searchValue}
@@ -38,20 +60,28 @@ const App = () => {
             </div>
             <div className="content">
                 {
-                    collections.filter(obj => obj.name.toLowerCase().includes(searchValue.toLowerCase()))
-                        .map((item, index) => (
-                            <Collection
-                                key={index}
-                                name={item.name}
-                                images={item.photos}
-                            />
-                        ))
+                    isLoading ? <h2>Loading...</h2>
+                        :
+                        collections.filter(obj => obj.name.toLowerCase().includes(searchValue.toLowerCase()))
+                            .map((item, index) => (
+                                <Collection
+                                    key={index}
+                                    name={item.name}
+                                    images={item.photos}
+                                />
+                            ))
                 }
             </div>
             <ul className="pagination">
-                <li>1</li>
-                <li className="active">2</li>
-                <li>3</li>
+                {
+                    [...Array(5)].map((_, index) => (
+                        <li
+                            onClick={() => setPage(index + 1)}
+                            className={page === index + 1 ? 'active' : ''}
+                        >
+                            {index + 1}
+                        </li>
+                    ))}
             </ul>
         </div>
     )
