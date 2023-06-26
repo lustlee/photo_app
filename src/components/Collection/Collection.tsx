@@ -1,7 +1,7 @@
 import React from 'react';
-import {ICollection} from "../../types";
+import {IPropsCollection} from "../../types";
 
-const Collection: React.FC<ICollection> = ({ name, images }) => {
+const Collection: React.FC<IPropsCollection> = ({ name, images }) => {
     return (
         <div className="collection">
             <img className="collection__big" src={images[0]} alt="Item" />
