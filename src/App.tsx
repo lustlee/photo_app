@@ -67,7 +67,7 @@ const App = () => {
                                 <Collection
                                     key={index}
                                     name={item.name}
-                                    images={item.photos}
+                                    photos={item.photos}
                                 />
                             ))
                 }
@@ -76,6 +76,7 @@ const App = () => {
                 {
                     [...Array(5)].map((_, index) => (
                         <li
+                            key={index}
                             onClick={() => setPage(index + 1)}
                             className={page === index + 1 ? 'active' : ''}
                         >
